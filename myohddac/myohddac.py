@@ -1,12 +1,13 @@
 import time
-import json
+import base64
 import pathlib
 from starlette.applications import Starlette
 from starlette.responses import FileResponse, JSONResponse
 from starlette.routing import Route, Mount
 from starlette.staticfiles import StaticFiles
 
-output_dir = 'numbers'
+output_dir = 'images'
+decode =  base64.urlsafe_b64decode
 
 pathlib.Path(output_dir).mkdir(exist_ok=True)
 
@@ -15,9 +16,9 @@ def homepage(request):
 
 async def save_img(request):
     request_body = await request.json()
-    f_name = '%s/%s-%s.json' % (output_dir, request_body['number'], time.time())
-    with open(f_name, 'w') as f:
-        json.dump(request_body['img'], f)
+    f_name = '%s/%s-%s.png' % (output_dir, request_body['number'], time.time())
+    with open(f_name, 'wb') as f:
+        f.write(decode(request_body['img'][22:]))
     return JSONResponse({'message':'saved as ' + f_name})
     
 routes = [

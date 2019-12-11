@@ -11,7 +11,7 @@ app.grabCanvas = function (id, lineWidth, scale) {
     app[id] = canvas;
 };
 app.grabCanvas('inputCanvas', 5, 1); // we draw on this canvas
-app.grabCanvas('previewCanvas', 2, 0.25); // and write to this canvas which is 1/4 size
+app.grabCanvas('previewCanvas', 2, 0.25); // and also write to this canvas which is 1/4 size
 
 app.inputCanvas.addEventListener('mousedown', e => {
     app.setCursorPositions(e);
@@ -41,7 +41,7 @@ app.setCursorPositions = function (e) {
 app.stopDrawing = function () {
     app.isDrawing = false;
     app.inputCanvas.style.cursor = 'auto';
-    app.setUserFeedbackMessage(app.hasDrawn()
+    app.setUserFeedbackMessage(app.hasDrawn
             ? 'Press S to save or C start again' : '');
 };
 app.drawLine = function (e) {
@@ -49,9 +49,9 @@ app.drawLine = function (e) {
         return;
     }
     app.canvases.forEach(function(canvas, i) {
-        context = canvas.getContext('2d');
+        context = canvas.getContext('2d', {alpha: false});
         context.beginPath();
-        context.strokeStyle = 'black';
+        context.strokeStyle = 'white';
         context.lineWidth = canvas._lineWidth;
         context.moveTo(canvas._clientX, canvas._clientY);
     });
@@ -59,30 +59,13 @@ app.drawLine = function (e) {
     app.setCursorPositions(e);
     
     app.canvases.forEach(function(canvas, i) {
-        context = canvas.getContext('2d');
+        context = canvas.getContext('2d', {alpha: false});
         context.lineTo(canvas._clientX, canvas._clientY);
         context.stroke();
         context.closePath();
     });
-};
-/**
- * Return a 1d array containing grayscale pixel values of a 28*28 image.
- */
-app.getCanvasData = function () {
-    result = []
-    context = app.previewCanvas.getContext('2d');
-    context.getImageData(0, 0, 28, 28).data.forEach(function (pixelValue, i) {
-        if (i % 4 === 3) {
-            result.push(pixelValue);
-        }
-    });
-    return result;
-}
-/**
- * Return true if we have anything drawn, false otherwise.
- */
-app.hasDrawn = function () {
-    return Math.max(...app.getCanvasData()) > 0;
+
+    app.hasDrawn = true;
 };
 app.pickNumberAtRandom = function () {
     app.currentNumber = Math.floor(Math.random() * 10);
@@ -95,15 +78,16 @@ app.setUserFeedbackMessage = function (message, imgDataUrl) {
             = (imgDataUrl) ? imgDataUrl : '';
 };
 app.clearCanvas = function () {
-    app.inputCanvas.getContext('2d').clearRect(0, 0, 112, 112);
-    app.previewCanvas.getContext('2d').clearRect(0, 0, 28, 28);
+    app.inputCanvas.getContext('2d', {alpha: false}).clearRect(0, 0, 112, 112);
+    app.previewCanvas.getContext('2d', {alpha: false}).clearRect(0, 0, 28, 28);
     app.setUserFeedbackMessage('');
+    app.hasDrawn = false;
 };
 /**
  * Post the user entered data to the server.
  */
 app.save = function () {
-    if (!app.hasDrawn()) {
+    if (!!!app.hasDrawn) {
         return;
     }
     imgDataUrl = app.previewCanvas.toDataURL('image/png');
@@ -120,7 +104,7 @@ app.save = function () {
     xhr.open('POST', '/img/save', true);
     xhr.send(JSON.stringify({
         number: app.currentNumber,
-        img: app.getCanvasData()
+        img: imgDataUrl
     }));
 };
 window.addEventListener('keydown', function(e) {
