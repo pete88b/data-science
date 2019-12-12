@@ -12,7 +12,7 @@ Please note: No attempt has been made to make the web app secure
 
 ## Dependencies
 - starlette and uvicorn if you want to run the web app
-    - if fastai the web app will predict what number has been drawn before saving
+    - if fastai is installed, the web app will predict what number has been drawn before saving
 - matplotlib if you want to run plot_numbers.py
 - fastai and jupyter if you want to run the notebooks
 
