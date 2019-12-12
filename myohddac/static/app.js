@@ -41,8 +41,9 @@ app.setCursorPositions = function (e) {
 app.stopDrawing = function () {
     app.isDrawing = false;
     app.inputCanvas.style.cursor = 'auto';
-    app.setUserFeedbackMessage(app.hasDrawn
-            ? 'Press S to save or C start again' : '');
+    app.setUserFeedbackMessage({
+        saveOrCancelMessage: app.hasDrawn
+    });
 };
 app.drawLine = function (e) {
     if (app.isDrawing !== true) {
@@ -72,15 +73,31 @@ app.pickNumberAtRandom = function () {
     document.getElementById('currentNumber').textContent 
             = app.namesOfNumbers[app.currentNumber];
 };
-app.setUserFeedbackMessage = function (message, imgDataUrl) {
-    document.getElementById('userFeedbackMessage').textContent = message;
+app.setUserFeedbackMessage = function (options) {
+    options = options || {} // avoid null references to options
+    document.getElementById('saveOrCancelMessage').style.display 
+            = options.saveOrCancelMessage ? 'inline' : 'none';
     document.getElementById('previewImg').src 
-            = (imgDataUrl) ? imgDataUrl : '';
+            = (options.imgDataUrl) ? options.imgDataUrl : '';
+    message = ''
+    if (options.probablity) {
+        options.probablity = Math.round(options.probablity * 1000) / 1000;
+        if (options.target === options.prediction) {
+            message = 'correctly predicted with a probability of ' + options.probablity;
+        } else {
+            message = 'incorrectly predicted to be ' + options.prediction
+                    + ' with a probability of ' + options.probablity;
+        }
+    } else if (options.savedAs) {
+        message = 'saved as ' + options.savedAs;
+    }
+    document.getElementById('userFeedbackMessage').textContent = message;
+    
 };
 app.clearCanvas = function () {
     app.inputCanvas.getContext('2d', {alpha: false}).clearRect(0, 0, 112, 112);
     app.previewCanvas.getContext('2d', {alpha: false}).clearRect(0, 0, 28, 28);
-    app.setUserFeedbackMessage('');
+    app.setUserFeedbackMessage();
     app.hasDrawn = false;
 };
 /**
@@ -95,10 +112,11 @@ app.save = function () {
     xhr.onreadystatechange = function () {
         if (this.readyState === 4) {
             // check HTTP status
+            response = JSON.parse(xhr.responseText);
+            response.imgDataUrl = imgDataUrl;
+            response.target = app.currentNumber;
             app.reset();
-            app.setUserFeedbackMessage(
-                JSON.parse(xhr.responseText).message,
-                imgDataUrl);
+            app.setUserFeedbackMessage(response);
         }
     };
     xhr.open('POST', '/img/save', true);

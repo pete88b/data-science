@@ -5,14 +5,22 @@
 }
 .grid-item {
     padding: 20px;
-    font-size: 30px;
+    font-size: xx-large;
     color: gray;
     text-align: center;
 }
 .inputCanvas {
-    border: 1px solid gray;
     cursor: auto;
 }
 .previewCanvas {
     display: none;
+}
+.messages {
+    font-size: medium;
+}
+.keyboard-key {
+    border-radius: 10px;
+    border: 2px solid gray;
+    padding: 10px;
+    cursor: pointer;
 }

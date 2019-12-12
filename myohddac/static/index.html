@@ -19,7 +19,14 @@
             </div>
             <div class="grid-item"></div>
             <div class="grid-item"></div>
-            <div class="grid-item">
+            <div class="grid-item messages">
+                <span id="saveOrCancelMessage" style="display: none;">
+                    <span class="keyboard-key" onclick="app.save()">S</span> or
+                    <span class="keyboard-key" onclick="app.save()">&#8629;</span> to save 
+                    <span class="keyboard-key" onclick="app.clearCanvas()">C</span>,
+                    <span class="keyboard-key" onclick="app.clearCanvas()">&#8592;</span> or
+                    <span class="keyboard-key" onclick="app.clearCanvas()">Del</span> to start again
+                </span>
                 <img id="previewImg" src=""></img>
                 <span id="userFeedbackMessage"></span>
             </div>
