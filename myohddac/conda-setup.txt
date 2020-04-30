@@ -1,0 +1,7 @@
+conda create -n myohddac python=3.7 -y
+conda activate myohddac
+conda install -n myohddac -c pytorch -c fastai fastai -y
+conda install -n myohddac jupyter notebook -y
+conda install -n myohddac -c conda-forge starlette -y
+conda install -n myohddac -c conda-forge uvicorn -y
+

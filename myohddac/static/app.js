@@ -10,6 +10,7 @@ app.grabCanvas = function (id, lineWidth, scale) {
     app.canvases.push(canvas);
     app[id] = canvas;
 };
+// TODO: give _lineWidth some random variance for each new drawing
 app.grabCanvas('inputCanvas', 5, 1); // we draw on this canvas
 app.grabCanvas('previewCanvas', 2, 0.25); // and also write to this canvas which is 1/4 size
 
@@ -80,13 +81,15 @@ app.setUserFeedbackMessage = function (options) {
     document.getElementById('previewImg').src 
             = (options.imgDataUrl) ? options.imgDataUrl : '';
     message = ''
-    if (options.probablity) {
-        options.probablity = Math.round(options.probablity * 1000) / 1000;
+    if (options.score) {
         if (options.target === options.prediction) {
-            message = 'correctly predicted with a probability of ' + options.probablity;
+            message = 'correctly predicted with a classification score of ' + options.score;
         } else {
             message = 'incorrectly predicted to be ' + options.prediction
-                    + ' with a probability of ' + options.probablity;
+                    + ' with a classification score of ' + options.score;
+        }
+        if (options.mnistOrNotScore) {
+            message += ' and an is digit score of ' + options.mnistOrNotScore;
         }
     } else if (options.savedAs) {
         message = 'saved as ' + options.savedAs;
