@@ -3,16 +3,23 @@ app.namesOfNumbers = [
     'zero', 'one', 'two', 'three', 'four',
     'five', 'six', 'seven', 'eight', 'nine'];
 app.canvases = [];
-app.grabCanvas = function (id, lineWidth, scale) {
+app.grabCanvas = function (id, scale) {
     canvas = document.getElementById(id);
-    canvas._lineWidth = lineWidth;
+    canvas._lineWidth = scale * 5; 
     canvas._scale = scale;
     app.canvases.push(canvas);
     app[id] = canvas;
 };
-// TODO: give _lineWidth some random variance for each new drawing
-app.grabCanvas('inputCanvas', 5, 1); // we draw on this canvas
-app.grabCanvas('previewCanvas', 2, 0.25); // and also write to this canvas which is 1/4 size
+
+app.grabCanvas('inputCanvas', 1); // we draw on this canvas
+app.grabCanvas('previewCanvas', 0.25); // and also write to this canvas which is 1/4 size
+
+app.resetCanvasLineWidth = function() {
+    lineWidth = (Math.random() * 7) + 2
+    app.canvases.forEach(function(canvas, i) {
+        canvas._lineWidth = lineWidth * canvas._scale;
+    });
+}
 
 app.inputCanvas.addEventListener('mousedown', e => {
     app.setCursorPositions(e);
@@ -138,6 +145,8 @@ window.addEventListener('keydown', function(e) {
 });
 app.reset = function () {
     app.clearCanvas();
+    // pick a different size "pen" for each new digit
+    app.resetCanvasLineWidth();
     app.pickNumberAtRandom();
 };
 app.reset();

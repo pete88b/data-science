@@ -3,6 +3,9 @@
 myohddac is;
 - a web app that makes it easy to "make your own hand drawn digits and characters"
     - that will work with the fastai MNIST png dataset
+- an exploration into building a system that can 
+    - classify hand drawn digits and 
+    - recognise things that are not digits
 - some tools to help working with the images created by the web app
 
 In this README, {myohddac_home} means the location of this project in your file system.
