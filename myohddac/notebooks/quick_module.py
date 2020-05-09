@@ -84,3 +84,49 @@ def cp_mnist(kind, ds_name='mnist_or_not'):
     print(f'copying from {p} to {o}')
     get_ipython().system('cp -r -u $p/. $o')
 #NbdevQuick:end(cp_mnist)
+#NbdevQuick:start(mnist_or_not_data)
+def mnist_or_not_data(path, stats=None):
+    tfms=get_transforms(do_flip=False)
+    return (ImageList.from_folder(path)
+        .split_by_folder(train='training', valid='testing')
+        .label_from_func(lambda x: 0. if 'not' in x.parts[-2] else 1.)
+        .transform(tfms, size=28)
+        .databunch(bs=256)
+        .normalize(imagenet_stats))
+#NbdevQuick:end(mnist_or_not_data)
+#NbdevQuick:start(get_y_preds_and_actuals)
+def get_y_preds_and_actuals(learn):
+    y_preds,y_actuals=[],[]
+    with torch.no_grad():
+        for i, (xb, yb) in enumerate(learn.data.valid_dl):
+            y_pred = learn.model(xb)
+            y_pred = torch.flatten(y_pred)
+            y_preds.append(y_pred)
+            y_actuals.append(yb)
+    return torch.cat(y_preds),torch.cat(y_actuals)
+#NbdevQuick:end(get_y_preds_and_actuals)
+#NbdevQuick:start(search_optimal_thresh)
+def search_optimal_thresh(start,step,y_preds,y_actuals,result=[0],depth=0,max_depth=3):
+    for i in range(11):
+        thresh=(i*step)+start
+        acc=accuracy_thresh(y_preds,y_actuals,thresh,False).item()
+        if acc>result[0]: result=[acc,thresh]
+    if depth<max_depth:
+        return search_optimal_thresh(result[1]-step, step/5, y_preds, y_actuals, result, depth+1)
+    return result
+#NbdevQuick:end(search_optimal_thresh)
+#NbdevQuick:start(regressor_acc_vs_classes)
+def regressor_acc_vs_classes(learn,ylim):
+    """for each class of digit, see how accurate the model is"""
+    # TODO: do somthing for not digits
+    d,opt_thresh=[],learn.model.opt_thresh
+    learn.data.batch_size=2048
+    for cls in range(10):
+        image_list=ImageList.from_folder(learn.path/f'testing/{cls}')
+        learn.data.add_test(image_list)
+        xb,_=next(iter(learn.data.test_dl))
+        output=learn.model(xb).flatten()
+        d.append([cls]+[(output>t).sum().item()/len(xb) for t in [opt_thresh-.1, opt_thresh, opt_thresh+.1]])
+    df = pd.DataFrame(d, columns=['Class', '-0.1', opt_thresh, '+0.1'])
+    df.plot.bar(x='Class', ylim=ylim); plt.legend(ncol=3); plt.xlabel('Classes');
+#NbdevQuick:end(regressor_acc_vs_classes)
