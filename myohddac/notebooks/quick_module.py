@@ -85,11 +85,11 @@ def cp_mnist(kind, ds_name='mnist_or_not'):
     get_ipython().system('cp -r -u $p/. $o')
 #NbdevQuick:end(cp_mnist)
 #NbdevQuick:start(mnist_or_not_data)
-def mnist_or_not_data(path, stats=None):
+def mnist_or_not_data(path, stats=None, label_dtype=float):
     tfms=get_transforms(do_flip=False)
     return (ImageList.from_folder(path)
         .split_by_folder(train='training', valid='testing')
-        .label_from_func(lambda x: 0. if 'not' in x.parts[-2] else 1.)
+        .label_from_func(lambda x: label_dtype(0) if 'not' in x.parts[-2] else label_dtype(1))
         .transform(tfms, size=28)
         .databunch(bs=256)
         .normalize(imagenet_stats))
@@ -112,7 +112,7 @@ def search_optimal_thresh(start,step,y_preds,y_actuals,result=[0],depth=0,max_de
         acc=accuracy_thresh(y_preds,y_actuals,thresh,False).item()
         if acc>result[0]: result=[acc,thresh]
     if depth<max_depth:
-        return search_optimal_thresh(result[1]-step, step/5, y_preds, y_actuals, result, depth+1)
+        return search_optimal_thresh(result[1]-step, step/5, y_preds, y_actuals, result, depth+1, max_depth)
     return result
 #NbdevQuick:end(search_optimal_thresh)
 #NbdevQuick:start(regressor_acc_vs_classes)
