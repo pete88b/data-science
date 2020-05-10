@@ -42,6 +42,4 @@ Image files will be saved to: {myohddac_home}/images
 - python plot_numbers.py
 
 ## To make predictions with your images
-- Run: notebooks/mnist-inference.ipynb
-
-notebooks/mnist-training.ipynb trained the model used by mnist-inference.ipynb so you don't have to run the training notebook.
+- Run: notebooks/011_mnist_inference.ipynb
